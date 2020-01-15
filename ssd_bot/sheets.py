@@ -13,11 +13,8 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 spreadsheet_id = '1B27_j9NDPU3cNlj2HKcrfpJKHkOf-Oi1DbuuQva2gT4'
 g_range = 'Master List!A:S'
 
-creds, service, sheet = None, None, None
-
 def main():
-    nonlocal creds, service, sheet
-    # creds = None
+    creds = None
 
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
@@ -59,6 +56,6 @@ if __name__ == '__main__':
     main()
 
 
-def lookup():
+# def lookup():
     
 # brands = service.spreadsheet().values().get('A')
