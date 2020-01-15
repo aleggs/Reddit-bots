@@ -1,0 +1,6 @@
+credentials.json
+__pycache__/
+.vscode
+credentials.json
+praw.ini
+token.pickle
