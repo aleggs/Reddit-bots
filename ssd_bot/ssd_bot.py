@@ -1,6 +1,6 @@
 import praw, os
 from helpers import *
-from sheets import main, lookup
+from sheets2 import main, lookup
 
 r = praw.Reddit('ssd_bot')
 bapcs = r.subreddit("botlaunchpad")
@@ -28,7 +28,7 @@ for submission in bapcs.new(limit=10):
         brand, model = title_filter(title, brands, models)
         
         submission.reply("Testing, here's the title: " + title + " and here's the brand: " + brand + " and here's the model: " + model)
-        lookup(brand, model)
+        # lookup(brand, model)
 # to label an SSD, we need name and model
 # use google sheets as a spreadsheet/database
 
