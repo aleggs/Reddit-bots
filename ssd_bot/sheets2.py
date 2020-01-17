@@ -21,10 +21,20 @@ def main():
     print("Completed one loop!")
     return (brands, models)
 
-def lookup(brand, model):
+def lookup_row(brand, model):
+    if not brand or not model: # if either does not exist
+        print("Error")
+        return
     gc = gspread.authorize(creds)
     sh = gc.open_by_key(spreadsheet_id)
     worksheet = sh.sheet1
 
-    cells = worksheet.findall(brand)
-    print(cells)
+    row = -1
+    brand_rows = [cell.row for cell in worksheet.findall(brand)]
+    model_rows = [cell.row for cell in worksheet.findall(model)]
+
+    for num in brand_rows:
+        if num in model_rows:
+            row = num
+    
+    return row

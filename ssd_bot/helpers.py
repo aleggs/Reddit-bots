@@ -38,8 +38,7 @@ def title_filter(title, brands, models):
     brand, model = '', ''
     for br in brands:
         if br.lower() in title.lower():
-            brand = br
-            
+            brand = br         
     for mdl in models:
         if mdl.lower() in title.lower():
             model = mdl

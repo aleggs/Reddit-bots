@@ -14,21 +14,19 @@ else:
         commented_on = commented_on.split("\n")
         commented_on = list(filter(None, commented_on))
 
-# Parses title for SSD name
-# Replies with information about the SSD
-# Searches for u/NewMaxx comments about this SSD
-
 for submission in bapcs.new(limit=10):
     # should be set based on avg posts per time interval
     if submission.id not in commented_on and "[SSD]" in submission.title:
-        commented_on.append(submission.id)
+        comment = ""
+        # commented_on.append(submission.id)
         title = submission.title
-        title = remove_spaces(title)
+
         brands, models = main()
         brand, model = title_filter(title, brands, models)
-        
-        submission.reply("Testing, here's the title: " + title + " and here's the brand: " + brand + " and here's the model: " + model)
-        # lookup(brand, model)
+        comment += "Title of post: " + title + "/ Brand: " + brand + "/ Model: " + model
+        lookup(brand, model)
+
+        # submission.reply(comment)
 # to label an SSD, we need name and model
 # use google sheets as a spreadsheet/database
 
