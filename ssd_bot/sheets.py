@@ -1,81 +1,49 @@
-# Google's shit
-import pickle, os.path
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-
-# my shit
-from helpers import all_in_one
 import gspread
-
-# If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-
+from oauth2client.service_account import ServiceAccountCredentials
+from helpers import all_in_one
+from pprint import pprint
+scope = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 spreadsheet_id = '1B27_j9NDPU3cNlj2HKcrfpJKHkOf-Oi1DbuuQva2gT4'
-g_range = 'Master List!A:S'
+creds = ServiceAccountCredentials.from_json_keyfile_name('creds_secret.json', scope)
 
-class Credentials(object):
-    def __init__(self, access_token = None):
-        self.access_token = access_token
-    def refresh(self, http):
-        access_token = auth()
+col_controller = 6 #F
+col_dram = 8 #H
+col_nandtype = 11 #K
+col_categories = 15 #O
 
-def auth():
-    creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-    return creds
 
 def main():
-    creds = auth()
+    gc = gspread.authorize(creds)
+    sh = gc.open_by_key(spreadsheet_id)
+    wks = sh.sheet1
 
-    # creds = None
-    # if os.path.exists('token.pickle'):
-    #     with open('token.pickle', 'rb') as token:
-    #         creds = pickle.load(token)
-    # if not creds or not creds.valid:
-    #     if creds and creds.expired and creds.refresh_token:
-    #         creds.refresh(Request())
-    #     else:
-    #         flow = InstalledAppFlow.from_client_secrets_file(
-    #             'credentials.json', SCOPES)
-    #         creds = flow.run_local_server(port=0)
-    #     with open('token.pickle', 'wb') as token:
-    #         pickle.dump(creds, token)
+    brands = wks.col_values(1)
+    brands = all_in_one(brands)
 
-    service = build('sheets', 'v4', credentials=creds)
-    sheet = service.spreadsheets()
-    
-    # gets the values from "Brands" column (A) and removes dupes, flattens the list, and removes spaces and special characters
-    brands = sheet.values().get(spreadsheetId=spreadsheet_id, range='A2:A250').execute()
-    brands = all_in_one(brands['values'])
-
-    # gets the values from "Models" column (B) and removes dupes, flattens the list, and removes spaces and special characters
-    models = sheet.values().get(spreadsheetId=spreadsheet_id, range='B2:B250').execute()
-    models = all_in_one(models['values'])
+    models = wks.col_values(2)
+    models = all_in_one(models)
 
     return (brands, models)
 
-if __name__ == '__main__':
-    main()
-
-
 def lookup(brand, model):
-    creds = Credentials(auth())
+    
     gc = gspread.authorize(creds)
     sh = gc.open_by_key(spreadsheet_id)
-    worksheet = sh.sheet1
+    wks = sh.sheet1
 
-    cells = worksheet.findall(brand)
-    print(cells)
-# brands = service.spreadsheet().values().get('A')
+    row = -1
+    brand_rows = [cell.row for cell in wks.findall(brand)]
+    model_rows = [cell.row for cell in wks.findall(model)]
+
+    for num in brand_rows:
+        if num in model_rows:
+            row = num
+    controller = wks.cell(row, col_controller).value
+    dram = wks.cell(row, col_dram).value
+    nandtype = wks.cell(row, col_nandtype).value
+    category = wks.cell(row, col_categories).value
+
+    return controller, dram, nandtype, category
+    
+
+

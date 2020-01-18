@@ -1,6 +1,6 @@
 import praw, os
 from helpers import *
-from sheets2 import main, lookup
+from sheets import main, lookup
 
 r = praw.Reddit('ssd_bot')
 bapcs = r.subreddit("botlaunchpad")
@@ -18,18 +18,16 @@ for submission in bapcs.new(limit=10):
     # should be set based on avg posts per time interval
     if submission.id not in commented_on and "[SSD]" in submission.title:
         comment = ""
-        # commented_on.append(submission.id)
+        commented_on.append(submission.id)
         title = submission.title
-
         brands, models = main()
         brand, model = title_filter(title, brands, models)
-        comment += "Title of post: " + title + "/ Brand: " + brand + "/ Model: " + model
-        lookup(brand, model)
-
-        # submission.reply(comment)
-# to label an SSD, we need name and model
-# use google sheets as a spreadsheet/database
-
+        comment += f"This SSD seems to be a {brand} {model}."
+        
+        controller, dram, nandtype, category = lookup(brand, model)
+        comment += f" It is {nandtype}, with a {controller} controller. {dram} for DRAM."
+        comment += f" u/NewMaxx classifies this as {category}."
+        submission.reply(comment)
 
 with open("commented_on.txt", "w") as f:
     for submission_id in commented_on:
