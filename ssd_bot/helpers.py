@@ -33,7 +33,7 @@ def list_to_string(lst):
     return "".join(lst)
 
 
-def title_filter(title, brands, models):
+def parse_title(title, brands, models):
     title = remove_spaces(title)
     brand, model = '', ''
     for br in brands:

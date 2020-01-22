@@ -1,9 +1,11 @@
-import praw, os
+import praw, os, sqlite3
 from helpers import *
-from sheets import main, lookup
+from sheets import brands_and_models, lookup
 
 r = praw.Reddit('ssd_bot')
 bapcs = r.subreddit("botlaunchpad")
+brands, models = None, None
+
 
 # Creates or updates commented_on.txt
 if not os.path.isfile("commented_on.txt"):
@@ -15,26 +17,23 @@ else:
         commented_on = list(filter(None, commented_on))
 
 for submission in bapcs.new(limit=10):
-    # should be set based on avg posts per time interval
     if submission.id not in commented_on and "[SSD]" in submission.title:
-        sentence_comment = ""
         commented_on.append(submission.id)
-        title = submission.title
-        brands, models = main()
-        brand, model = title_filter(title, brands, models)
-        sentence_comment += f"This SSD seems to be a {brand} {model}."
-        
-        controller, dram, nandtype, category = lookup(brand, model)
-        sentence_comment += f" It is {nandtype}, with a {controller} controller. {dram} for DRAM."
-        sentence_comment += f" u/NewMaxx classifies this as {category}."
-        # submission.reply(sentence_comment)
+        comment = ""
 
-        info_comment = f"Serving up some information about this {brand} {model}.\n\n"
-        info_comment += f"NAND type: **{nandtype}**\n\nDRAM: **{dram}**\n\nController: **{controller}**\n\n"
-        info_comment += f"Classified as: **{category}**\n\n"
-        # info_comment += "This bot made possible by NewMaxx and company."
-        submission.reply(info_comment)
+        title = submission.title
+        brands, models = brands_and_models()
+        brand, model = parse_title(title, brands, models)
+        controller, dram, nandtype, category = lookup(brand, model)
+
+        comment += f"Serving up some information about this {brand} {model}.\n\n"
+        comment += f"NAND type: **{nandtype}**\n\nDRAM: **{dram}**\n\nController: **{controller}**\n\n"
+        comment += f"Classified as: **{category}**\n\n"
+
+        print(comment)
+        # submission.reply(comment)
 
 with open("commented_on.txt", "w") as f:
     for submission_id in commented_on:
         f.write(submission_id + "\n")
+
