@@ -1,13 +1,23 @@
-import praw, os, sqlite3
+'''
+Note: To set up the virtual environment, the following packages are required:
+virtualenv, gspread, praw, sqlite3, oauth
+'''
+
+import praw, os
 from helpers import *
+from comment_tracker import *
 from sheets import brands_and_models, lookup
 
+
+# begin code
 r = praw.Reddit('ssd_bot')
 bapcs = r.subreddit("botlaunchpad")
-brands, models = None, None
+username = "NewMaxx"
 
 
-# Creates or updates commented_on.txt
+brands, models = brands_and_models()
+comment_tracker(username)
+
 if not os.path.isfile("commented_on.txt"):
     commented_on = []
 else:
@@ -22,7 +32,6 @@ for submission in bapcs.new(limit=10):
         comment = ""
 
         title = submission.title
-        brands, models = brands_and_models()
         brand, model = parse_title(title, brands, models)
         controller, dram, nandtype, category = lookup(brand, model)
 
@@ -30,7 +39,7 @@ for submission in bapcs.new(limit=10):
         comment += f"NAND type: **{nandtype}**\n\nDRAM: **{dram}**\n\nController: **{controller}**\n\n"
         comment += f"Classified as: **{category}**\n\n"
 
-        print(comment)
+        # print(comment)
         # submission.reply(comment)
 
 with open("commented_on.txt", "w") as f:

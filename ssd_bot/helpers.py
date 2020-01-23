@@ -42,5 +42,5 @@ def parse_title(title, brands, models):
     for mdl in models:
         if mdl.lower() in title.lower():
             model = mdl
-    return (brand, model)
+    return brand, model
             
