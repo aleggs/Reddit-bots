@@ -6,7 +6,7 @@ Currently limited to just ssd_bot.
 
 **Built with:** Python, Flask, Google Sheets API, gspread, and PRAW
 
-##### Core function
+### Core function
 
 The core file, ssd_bot.py, is run every minute. It uses PRAW to scan r/buildapcsales for new posts, and when a submission is tagged with [SSD], it runs the main function. It then:
 
@@ -20,7 +20,7 @@ The core file, ssd_bot.py, is run every minute. It uses PRAW to scan r/buildapcs
 
 5. Comments that information on a submission.
 
-##### Comment parsing
+### Comment parsing
 
 The secondary function of SSD Bot is to classify and compile NewMaxx's comments about SSDs on r/bapcs into a database, (powered by SQLite and Flask) and then when the bot is summoned, link or quote from those comments. It:
 
