@@ -1,4 +1,4 @@
-#!/home/alex/Documents/code/reddit-bots/ssd_bot/venv/bin/python3
+#!/mnt/c/code/reddit-bots/ssd_bot/venv/bin/python3
 
 import argparse
 import code

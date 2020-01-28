@@ -1,22 +1,22 @@
 '''
-Note: To set up the virtual environment, the following packages are required:
-virtualenv, gspread, praw, sqlite3, oauth
+The following packages are required for proper functioning of the bot:
+gspread, praw, sqlite3, oauth2client
 '''
 
-import praw, os
-from helpers import *
-from comment_tracker import *
-from sheets import brands_and_models, lookup
+import praw, os, sheets, helpers
 
 
-# begin code
-r = praw.Reddit('ssd_bot')
-bapcs = r.subreddit("botlaunchpad")
-username = "NewMaxx"
+# Authenticating bot with PRAW
+reddit = praw.Reddit('ssd_bot')
+# Subreddit name
+sub = reddit.subreddit("botlaunchpad")
+# Desired flair to search for
+flair = "[SSD]"
 
 
-brands, models = brands_and_models()
-comment_tracker(username)
+# Updates these variables once per run: SSD brands and models, comment database
+brands, models = sheets.brands_and_models()
+# comment_tracker.comment_tracker(username)
 
 if not os.path.isfile("commented_on.txt"):
     commented_on = []
@@ -26,21 +26,18 @@ else:
         commented_on = commented_on.split("\n")
         commented_on = list(filter(None, commented_on))
 
-for submission in bapcs.new(limit=10):
-    if submission.id not in commented_on and "[SSD]" in submission.title:
+for submission in sub.new(limit=10):
+    if submission.id not in commented_on and flair in submission.title:
         commented_on.append(submission.id)
+        brand, model = helpers.get_brand_and_model(submission.title, brands, models)
+        controller, dram, nandtype, category = sheets.lookup(brand, model)
+
         comment = ""
-
-        title = submission.title
-        brand, model = parse_title(title, brands, models)
-        controller, dram, nandtype, category = lookup(brand, model)
-
         comment += f"Serving up some information about this {brand} {model}.\n\n"
         comment += f"NAND type: **{nandtype}**\n\nDRAM: **{dram}**\n\nController: **{controller}**\n\n"
         comment += f"Classified as: **{category}**\n\n"
 
-        # print(comment)
-        # submission.reply(comment)
+        submission.reply(comment)
 
 with open("commented_on.txt", "w") as f:
     for submission_id in commented_on:

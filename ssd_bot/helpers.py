@@ -6,7 +6,7 @@ def flatten(lst):
         else:
             out.append(item)
     return out
-
+    
 
 def remove_dupes(lst):
     new_lst = []
@@ -33,7 +33,7 @@ def list_to_string(lst):
     return "".join(lst)
 
 
-def parse_title(title, brands, models):
+def get_brand_and_model(title, brands, models):
     title = remove_spaces(title)
     brand, model = '', ''
     for br in brands:
