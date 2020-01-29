@@ -6,6 +6,11 @@ Currently limited to just ssd_bot.
 
 **Built with:** Python, Flask, Google Sheets API, gspread, oauth2, and PRAW
 
+Here's what a typical reply would look like:
+
+![Inland Premium reply](ssd_bot/Usage.PNG)
+
+
 ### Core function
 
 The core file, ssd_bot.py, is run every minute. It uses PRAW to scan r/buildapcsales for new posts, and when a submission is tagged with [SSD], it runs the main function. It then:
@@ -22,7 +27,7 @@ The core file, ssd_bot.py, is run every minute. It uses PRAW to scan r/buildapcs
 
 5. Comments all that information on a submission.
 
-![What a typical reply to a post would look like](ssd_bot/Usage.PNG)
+
 
 ### Comment parsing
 
