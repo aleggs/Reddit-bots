@@ -22,6 +22,8 @@ The core file, ssd_bot.py, is run every minute. It uses PRAW to scan r/buildapcs
 
 5. Comments all that information on a submission.
 
+![What a typical reply to a post would look like](ssd_bot/Usage.PNG)
+
 ### Comment parsing
 
 The secondary function of SSD Bot is add relevant comments onto a post. 
