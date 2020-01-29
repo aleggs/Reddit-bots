@@ -4,7 +4,7 @@ Currently limited to just ssd_bot.
 
 ## SSD Bot
 
-**Built with:** Python, Flask, Google Sheets API, gspread, and PRAW
+**Built with:** Python, Flask, Google Sheets API, gspread, oauth2, and PRAW
 
 ### Core function
 
@@ -18,16 +18,18 @@ The core file, ssd_bot.py, is run every minute. It uses PRAW to scan r/buildapcs
 
 4. Scans the row to get desired information.
 
-5. Comments that information on a submission.
+5. Calls comment parsing to look up relevant comments.
+
+5. Comments all that information on a submission.
 
 ### Comment parsing
 
-The secondary function of SSD Bot is to classify and compile NewMaxx's comments about SSDs on r/bapcs into a database, (powered by SQLite and Flask) and then when the bot is summoned, link or quote from those comments. It:
+The secondary function of SSD Bot is add relevant comments onto a post. 
 
-1. Connects to a SQL database (comments.db).
+1. During the setup phase, it compiles all comments from r/buildapcsales that match the brand and model of the current post into comments.db. 
 
-2. Parses through u/NewMaxx's comments.
+2. comments.db tracks comment ID, number of keyword matches, brand, model, comment permalink, comment score, and the text in the body of the comment.
 
-3. Adds them to comment.db, tracking comment ID, brand and model mentioned, comment score, and the text in the body of the comment.
-   
-   * It makes use of PRAW's comment ID feature and SQL's primary key feature to avoid duplication of comments in the database.
+3. When the main file is run, it looks through the database and attempts to pick out the most relevant comments.
+
+4. It returns those comments to the core function.
