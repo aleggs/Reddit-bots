@@ -1,35 +1,52 @@
-import praw, os, sqlite3
-from helpers import *
-from sheets import brands_and_models
+"""Comment tracker:
+Parses through NewMaxx's comments, compiles all new comments into database.
+Database has six columns: Comment ID, SSD (is it about an SSD), Brand, Model, Score, and Body
+"""
 
-r = praw.Reddit('ssd_bot')
-keywords = ['SSD']
+import praw, os, sqlite3, helpers, sheets
 
-def comment_tracker(username):
-    brands, models = brands_and_models()
-    keywords.extend(brands)
-    keywords.extend(models)
-    # print(f"Keywords: {keywords}")
-    user = r.redditor(username)
+reddit = praw.Reddit('ssd_bot')
+keywords = []
+username = "NewMaxx"
 
-    # first time setup
+
+
+
+def comment_tracker(username = username):
+
+    brands, models = sheets.brands_and_models()
+    
     if not os.path.isfile("comments.db"):
         db = sqlite3.Connection('comments.db')
-        db.execute('''CREATE TABLE comments (id PRIMARY KEY, brand, model, score, body);''')
+        db.execute('''CREATE TABLE comments (id PRIMARY KEY, ssd, brand, model, score, body);''')
+        for comment in user.comments.all():
+            brand, model = helpers.get_brand_and_model(comment.submission.title, brands, models)
+            db.execute(f'''INSERT INTO comments VALUES ((?),(?),(?),(?),(?),(?));''', [comment.id, ssd_or_not(comment), brand, model, comment.score, comment.body])
 
-    # every other time, just updates the database
     else:
         db = sqlite3.Connection('comments.db')
         for comment in user.comments.new(limit = 10):
             submission = comment.submission
-            brand, model = parse_title(submission.title, brands, models)
-            # incoming SQL Injection
-            # filter if comment id in comments
-            db.execute(f'''INSERT INTO comments VALUES ((?),(?),(?),(?),(?));''', [comment.id, brand, model, comment.score, comment.body])
-        print(db.execute('''SELECT id, brand, model, score FROM comments''').fetchall())
+            brand, model = helpers.get_brand_and_model(comment.submission.title, brands, models)
+            db.execute(f'''INSERT INTO comments VALUES ((?),(?),(?),(?),(?),(?));''', [comment.id, ssd_or_not(comment), brand, model, comment.score, comment.body])
+        # print(db.execute('''SELECT * FROM comments''').fetchall())
     db.close()
 
+    # brands, models = brands_and_models()
+    keywords.extend(brands)
+    keywords.extend(models)
+    user = r.redditor(username)
 
+
+"""
+How to tell if a comment is about an SSD, and what SSD it is about?
+### This seems to call for some Data Science/Tensorflow :O but I don't know how to do that yet. Revisit in Summer 2020.
+1. Post replied to is about an SSD.
+    a) Has keywords in title.
+2. Comment has keywords in it.
+
+
+"""
 def ssd_or_not(comment):
     # determines if the comment pertains to an SSD
     for keyword in keywords:
