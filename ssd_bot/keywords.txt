@@ -2,16 +2,10 @@ TLC
 QLC
 NAND
 DRAM
-TB
-SSD
 SATA
 NVMe
 Cache
 SLC
 MLC
-capacity
 sequential
-read
-write
 controller
-GB

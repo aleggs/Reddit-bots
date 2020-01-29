@@ -27,7 +27,6 @@ def get_relevant_comments(brand, model, brands, models):
     return relevant_comments
 
 
-
 def update_db(brand, model, brands, models):
     # open submissions.txt
     if not os.path.isfile("submissions.txt"):
@@ -50,14 +49,12 @@ def update_db(brand, model, brands, models):
     search_string = f"{brand} {model}"
     # search through submissions
     for submission in sub.search(search_string):
-        print("update_db ran once. " + submission.title)
         if submission.id not in submissions:
-            # submissions.append(submission.id) # uncomment
+            submissions.append(submission.id) # uncomment
             
             submission.comment_sort = 'best'
             for comment in submission.comments:
                 brand, model = helpers.get_brand_and_model(comment.submission.title, brands, models)
-                print([comment.id, match_keywords(comment, keywords), brand, model, comment.permalink, comment.body])
                 db.execute('''INSERT or IGNORE INTO comments VALUES (?,?,?,?,?,?,?);''', [comment.id, match_keywords(comment, keywords), brand, model, comment.permalink, comment.score, comment.body])
                 db.commit()
     db.close()

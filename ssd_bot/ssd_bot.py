@@ -29,7 +29,7 @@ else:
 
 for submission in sub.new(limit=10):
     if submission.id not in commented_on and flair in submission.title:
-        # commented_on.append(submission.id) # uncomment
+        commented_on.append(submission.id) # uncomment
         brand, model = helpers.get_brand_and_model(submission.title, brands, models)
         controller, dram, nandtype, category = sheets.lookup(brand, model)
 
@@ -42,7 +42,6 @@ for submission in sub.new(limit=10):
         print(more_comments) # delete
         comment += f"Here are some potentially relevant comments:\n\n"
         for lst in more_comments:
-            print(lst) # delete
             comment += f"[{lst[0][:200]}...]({lst[1]})\n\n"
         submission.reply(comment)
 
