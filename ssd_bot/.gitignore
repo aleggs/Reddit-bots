@@ -1,6 +1,6 @@
 __pycache__/
 .vscode
-
+venv/
 credentials.json
 creds_secret.json
 
